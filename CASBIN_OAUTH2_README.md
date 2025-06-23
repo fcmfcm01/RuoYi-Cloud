@@ -19,6 +19,9 @@
 - **JWT令牌支持**
 - **第三方应用集成**
 - **自授权和外部OAuth2.0服务器支持**
+- **客户端动态注册和管理**
+- **JPA数据持久化**
+- **第三方OAuth服务器配置管理**
 
 ## 项目结构
 
@@ -171,6 +174,32 @@ curl -H "Authorization: Bearer ACCESS_TOKEN" \
 | `/oauth2/user` | GET | 获取用户信息 |
 | `/oauth2/token/status` | GET | 检查令牌状态 |
 | `/oauth2/revoke` | DELETE | 撤销授权 |
+
+### 客户端管理 API
+
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/oauth2/clients/register` | POST | 注册新客户端 |
+| `/oauth2/clients/{clientId}` | GET | 获取客户端详情 |
+| `/oauth2/clients/{clientId}` | PUT | 更新客户端 |
+| `/oauth2/clients/{clientId}` | DELETE | 删除客户端 |
+| `/oauth2/clients/{clientId}/reset-secret` | POST | 重置客户端密钥 |
+| `/oauth2/clients/{clientId}/toggle-status` | POST | 启用/禁用客户端 |
+| `/oauth2/clients` | GET | 分页查询客户端 |
+| `/oauth2/clients/enabled` | GET | 获取启用的客户端 |
+
+### 第三方OAuth服务器管理 API
+
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/oauth2/third-party-servers` | POST | 添加第三方OAuth服务器 |
+| `/oauth2/third-party-servers/{id}` | GET | 获取服务器详情 |
+| `/oauth2/third-party-servers/{id}` | PUT | 更新服务器配置 |
+| `/oauth2/third-party-servers/{id}` | DELETE | 删除服务器 |
+| `/oauth2/third-party-servers/{id}/toggle-status` | POST | 启用/禁用服务器 |
+| `/oauth2/third-party-servers` | GET | 分页查询服务器 |
+| `/oauth2/third-party-servers/enabled` | GET | 获取启用的服务器 |
+| `/oauth2/third-party-servers/{id}/test-connection` | POST | 测试服务器连接 |
 
 ## 权限模型
 
