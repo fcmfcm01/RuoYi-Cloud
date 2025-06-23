@@ -13,8 +13,27 @@ public class AuthUtil
 {
     /**
      * 底层的 AuthLogic 对象
+     * 优先使用CasbinAuthLogic，如果不可用则使用默认的AuthLogic
      */
-    public static AuthLogic authLogic = new AuthLogic();
+    public static AuthLogic authLogic = createAuthLogic();
+
+    /**
+     * 创建AuthLogic实例
+     */
+    private static AuthLogic createAuthLogic()
+    {
+        try
+        {
+            // 尝试创建CasbinAuthLogic
+            Class<?> casbinAuthLogicClass = Class.forName("com.ruoyi.common.casbin.auth.CasbinAuthLogic");
+            return (AuthLogic) casbinAuthLogicClass.newInstance();
+        }
+        catch (Exception e)
+        {
+            // 如果Casbin模块不可用，使用默认的AuthLogic
+            return new AuthLogic();
+        }
+    }
 
     /**
      * 会话注销
@@ -163,5 +182,160 @@ public class AuthUtil
     public static void checkPermiOr(String... permissions)
     {
         authLogic.checkPermiOr(permissions);
+    }
+
+    // ==================== Casbin 扩展方法 ====================
+
+    /**
+     * 使用Casbin验证权限
+     * 
+     * @param subject 主体（用户）
+     * @param object 对象（资源）
+     * @param action 动作（操作）
+     * @return 是否有权限
+     */
+    public static boolean enforce(String subject, String object, String action)
+    {
+        try
+        {
+            if (authLogic.getClass().getName().contains("CasbinAuthLogic"))
+            {
+                return (Boolean) authLogic.getClass()
+                        .getMethod("enforce", String.class, String.class, String.class)
+                        .invoke(authLogic, subject, object, action);
+            }
+        }
+        catch (Exception e)
+        {
+            // 如果调用失败，返回false
+        }
+        return false;
+    }
+
+    /**
+     * 检查Casbin权限，如果验证未通过，则抛出异常
+     * 
+     * @param subject 主体（用户）
+     * @param object 对象（资源）
+     * @param action 动作（操作）
+     */
+    public static void checkEnforce(String subject, String object, String action)
+    {
+        try
+        {
+            if (authLogic.getClass().getName().contains("CasbinAuthLogic"))
+            {
+                authLogic.getClass()
+                        .getMethod("checkEnforce", String.class, String.class, String.class)
+                        .invoke(authLogic, subject, object, action);
+            }
+        }
+        catch (Exception e)
+        {
+            // 如果调用失败，抛出权限不足异常
+            throw new RuntimeException("权限验证失败: " + subject + " -> " + object + ":" + action);
+        }
+    }
+
+    /**
+     * 为用户添加角色
+     * 
+     * @param user 用户
+     * @param role 角色
+     * @return 是否添加成功
+     */
+    public static boolean addRoleForUser(String user, String role)
+    {
+        try
+        {
+            if (authLogic.getClass().getName().contains("CasbinAuthLogic"))
+            {
+                return (Boolean) authLogic.getClass()
+                        .getMethod("addRoleForUser", String.class, String.class)
+                        .invoke(authLogic, user, role);
+            }
+        }
+        catch (Exception e)
+        {
+            // 如果调用失败，返回false
+        }
+        return false;
+    }
+
+    /**
+     * 删除用户角色
+     * 
+     * @param user 用户
+     * @param role 角色
+     * @return 是否删除成功
+     */
+    public static boolean deleteRoleForUser(String user, String role)
+    {
+        try
+        {
+            if (authLogic.getClass().getName().contains("CasbinAuthLogic"))
+            {
+                return (Boolean) authLogic.getClass()
+                        .getMethod("deleteRoleForUser", String.class, String.class)
+                        .invoke(authLogic, user, role);
+            }
+        }
+        catch (Exception e)
+        {
+            // 如果调用失败，返回false
+        }
+        return false;
+    }
+
+    /**
+     * 添加权限策略
+     * 
+     * @param subject 主体
+     * @param object 对象
+     * @param action 动作
+     * @return 是否添加成功
+     */
+    public static boolean addPolicy(String subject, String object, String action)
+    {
+        try
+        {
+            if (authLogic.getClass().getName().contains("CasbinAuthLogic"))
+            {
+                return (Boolean) authLogic.getClass()
+                        .getMethod("addPolicy", String.class, String.class, String.class)
+                        .invoke(authLogic, subject, object, action);
+            }
+        }
+        catch (Exception e)
+        {
+            // 如果调用失败，返回false
+        }
+        return false;
+    }
+
+    /**
+     * 删除权限策略
+     * 
+     * @param subject 主体
+     * @param object 对象
+     * @param action 动作
+     * @return 是否删除成功
+     */
+    public static boolean removePolicy(String subject, String object, String action)
+    {
+        try
+        {
+            if (authLogic.getClass().getName().contains("CasbinAuthLogic"))
+            {
+                return (Boolean) authLogic.getClass()
+                        .getMethod("removePolicy", String.class, String.class, String.class)
+                        .invoke(authLogic, subject, object, action);
+            }
+        }
+        catch (Exception e)
+        {
+            // 如果调用失败，返回false
+        }
+        return false;
     }
 }

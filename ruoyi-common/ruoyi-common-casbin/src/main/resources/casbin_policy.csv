@@ -1,0 +1,11 @@
+p, admin, system:user, read
+p, admin, system:user, write
+p, admin, system:role, read
+p, admin, system:role, write
+p, admin, system:menu, read
+p, admin, system:menu, write
+p, user, system:user, read
+p, user, system:profile, read
+p, user, system:profile, write
+g, admin, admin_role
+g, user, user_role

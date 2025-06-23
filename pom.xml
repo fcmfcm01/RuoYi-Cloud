@@ -34,6 +34,12 @@
         <poi.version>4.1.2</poi.version>
         <springdoc.version>1.6.9</springdoc.version>
         <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
+        <!-- casbin version -->
+        <casbin.version>1.41.2</casbin.version>
+        <casbin-spring-boot-starter.version>1.1.0</casbin-spring-boot-starter.version>
+        <!-- oauth2 version -->
+        <spring-security-oauth2.version>2.5.2</spring-security-oauth2.version>
+        <spring-security-oauth2-autoconfigure.version>2.6.8</spring-security-oauth2-autoconfigure.version>
         <!-- override dependency version -->
         <tomcat.version>9.0.106</tomcat.version>
         <logback.version>1.2.13</logback.version>
@@ -182,6 +188,40 @@
                 <version>${transmittable-thread-local.version}</version>
             </dependency>
 
+            <!-- Casbin 权限管理 -->
+            <dependency>
+                <groupId>org.casbin</groupId>
+                <artifactId>casbin-spring-boot-starter</artifactId>
+                <version>${casbin-spring-boot-starter.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.casbin</groupId>
+                <artifactId>jcasbin</artifactId>
+                <version>${casbin.version}</version>
+            </dependency>
+
+            <!-- OAuth2 授权服务器 -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-oauth2-authorization-server</artifactId>
+                <version>${spring-security-oauth2.version}</version>
+            </dependency>
+
+            <!-- OAuth2 客户端 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-oauth2-client</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- OAuth2 资源服务器 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
             <!-- 核心模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
@@ -252,6 +292,20 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+            <!-- Casbin权限管理 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-casbin</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- OAuth2客户端 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-oauth2</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -262,6 +316,7 @@
         <module>ruoyi-modules</module>
         <module>ruoyi-api</module>
         <module>ruoyi-common</module>
+        <module>ruoyi-oauth2-server</module>
     </modules>
     <packaging>pom</packaging>
 
