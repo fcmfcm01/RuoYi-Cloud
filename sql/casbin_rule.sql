@@ -75,9 +75,51 @@ CREATE TABLE `oauth2_registered_client` (
   `scopes` varchar(1000) NOT NULL COMMENT '授权范围',
   `client_settings` varchar(2000) NOT NULL COMMENT '客户端设置',
   `token_settings` varchar(2000) NOT NULL COMMENT '令牌设置',
+  `description` varchar(500) DEFAULT NULL COMMENT '描述',
+  `status` int(1) DEFAULT 1 COMMENT '状态(1-启用 0-禁用)',
+  `created_by` varchar(64) DEFAULT NULL COMMENT '创建者',
+  `updated_by` varchar(64) DEFAULT NULL COMMENT '更新者',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_client_id` (`client_id`)
+  UNIQUE KEY `uk_client_id` (`client_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='OAuth2.0客户端注册表';
+
+-- ----------------------------
+-- 第三方OAuth2.0服务器配置表
+-- ----------------------------
+DROP TABLE IF EXISTS `oauth2_third_party_server`;
+CREATE TABLE `oauth2_third_party_server` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `server_name` varchar(100) NOT NULL COMMENT '服务器名称',
+  `server_code` varchar(50) NOT NULL COMMENT '服务器代码',
+  `authorization_uri` varchar(500) NOT NULL COMMENT '授权URI',
+  `token_uri` varchar(500) NOT NULL COMMENT '令牌URI',
+  `user_info_uri` varchar(500) DEFAULT NULL COMMENT '用户信息URI',
+  `jwk_set_uri` varchar(500) DEFAULT NULL COMMENT 'JWK Set URI',
+  `issuer_uri` varchar(500) DEFAULT NULL COMMENT 'Issuer URI',
+  `client_id` varchar(200) NOT NULL COMMENT '客户端ID',
+  `client_secret` varchar(500) NOT NULL COMMENT '客户端密钥',
+  `scopes` varchar(1000) DEFAULT NULL COMMENT '授权范围',
+  `user_name_attribute` varchar(100) DEFAULT NULL COMMENT '用户名属性',
+  `client_name` varchar(200) DEFAULT NULL COMMENT '客户端名称',
+  `redirect_uri_template` varchar(500) DEFAULT NULL COMMENT '重定向URI模板',
+  `provider_type` varchar(50) DEFAULT NULL COMMENT '提供商类型',
+  `description` varchar(500) DEFAULT NULL COMMENT '描述',
+  `status` int(1) DEFAULT 1 COMMENT '状态(1-启用 0-禁用)',
+  `sort_order` int(11) DEFAULT 0 COMMENT '排序顺序',
+  `created_by` varchar(64) DEFAULT NULL COMMENT '创建者',
+  `updated_by` varchar(64) DEFAULT NULL COMMENT '更新者',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_server_code` (`server_code`),
+  KEY `idx_provider_type` (`provider_type`),
+  KEY `idx_status` (`status`),
+  KEY `idx_sort_order` (`sort_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='第三方OAuth2.0服务器配置表';
 
 -- ----------------------------
 -- OAuth2.0授权表
@@ -130,5 +172,22 @@ CREATE TABLE `oauth2_authorization_consent` (
   `registered_client_id` varchar(100) NOT NULL COMMENT '注册客户端ID',
   `principal_name` varchar(200) NOT NULL COMMENT '主体名称',
   `authorities` varchar(1000) NOT NULL COMMENT '权限',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`registered_client_id`, `principal_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='OAuth2.0授权同意表';
+
+-- ----------------------------
+-- 初始化OAuth2.0客户端数据
+-- ----------------------------
+INSERT INTO `oauth2_registered_client` (`id`, `client_id`, `client_name`, `client_secret`, `client_authentication_methods`, `authorization_grant_types`, `redirect_uris`, `post_logout_redirect_uris`, `scopes`, `client_settings`, `token_settings`, `description`, `status`) VALUES
+('ruoyi-client-id', 'ruoyi-client', 'RuoYi默认客户端', '{bcrypt}$2a$10$MF7hYnWLeLT66gNccBgxaONZHbrSMjlUofkp0ta0MKlAFGTsn1Wr2', 'client_secret_basic,client_secret_post', 'authorization_code,refresh_token,client_credentials', 'http://127.0.0.1:8080/login/oauth2/code/ruoyi-client,http://127.0.0.1:8080/authorized', 'http://127.0.0.1:8080/logged-out', 'openid,profile,read,write', '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":true}', '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":true,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",3600.000000000],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"self-contained"},"settings.token.refresh-token-time-to-live":["java.time.Duration",7200.000000000],"settings.token.authorization-code-time-to-live":["java.time.Duration",300.000000000]}', 'RuoYi系统默认OAuth2.0客户端', 1);
+
+-- ----------------------------
+-- 初始化第三方OAuth服务器数据
+-- ----------------------------
+INSERT INTO `oauth2_third_party_server` (`server_name`, `server_code`, `authorization_uri`, `token_uri`, `user_info_uri`, `client_id`, `client_secret`, `scopes`, `user_name_attribute`, `client_name`, `redirect_uri_template`, `provider_type`, `description`, `status`, `sort_order`) VALUES
+('GitHub OAuth', 'github', 'https://github.com/login/oauth/authorize', 'https://github.com/login/oauth/access_token', 'https://api.github.com/user', 'your-github-client-id', '{bcrypt}$2a$10$MF7hYnWLeLT66gNccBgxaONZHbrSMjlUofkp0ta0MKlAFGTsn1Wr2', 'user:email,read:user', 'login', 'GitHub', '{baseUrl}/login/oauth2/code/{registrationId}', 'github', 'GitHub第三方OAuth2.0登录', 0, 1),
+('Google OAuth', 'google', 'https://accounts.google.com/o/oauth2/v2/auth', 'https://www.googleapis.com/oauth2/v4/token', 'https://www.googleapis.com/oauth2/v3/userinfo', 'your-google-client-id', '{bcrypt}$2a$10$MF7hYnWLeLT66gNccBgxaONZHbrSMjlUofkp0ta0MKlAFGTsn1Wr2', 'openid,profile,email', 'sub', 'Google', '{baseUrl}/login/oauth2/code/{registrationId}', 'google', 'Google第三方OAuth2.0登录', 0, 2),
+('微信开放平台', 'wechat', 'https://open.weixin.qq.com/connect/qrconnect', 'https://api.weixin.qq.com/sns/oauth2/access_token', 'https://api.weixin.qq.com/sns/userinfo', 'your-wechat-appid', '{bcrypt}$2a$10$MF7hYnWLeLT66gNccBgxaONZHbrSMjlUofkp0ta0MKlAFGTsn1Wr2', 'snsapi_login', 'openid', '微信', '{baseUrl}/login/oauth2/code/{registrationId}', 'wechat', '微信开放平台第三方登录', 0, 3),
+('钉钉开放平台', 'dingtalk', 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize', 'https://oapi.dingtalk.com/sns/gettoken', 'https://oapi.dingtalk.com/sns/getuserinfo', 'your-dingtalk-appid', '{bcrypt}$2a$10$MF7hYnWLeLT66gNccBgxaONZHbrSMjlUofkp0ta0MKlAFGTsn1Wr2', 'snsapi_login', 'openid', '钉钉', '{baseUrl}/login/oauth2/code/{registrationId}', 'dingtalk', '钉钉开放平台第三方登录', 0, 4);
