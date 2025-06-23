@@ -1,0 +1,67 @@
+# OAuth2.0授权服务器配置
+server:
+  port: 9000
+
+spring:
+  application:
+    name: ruoyi-oauth2-server
+  
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ry-cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: root
+    password: password
+
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  # Security配置
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: http://localhost:9000
+        client:
+          ruoyi-client:
+            registration:
+              client-id: ruoyi-client
+              client-secret: "{bcrypt}$2a$10$MF7hYnWLeLT66gNccBgxaONZHbrSMjlUofkp0ta0MKlAFGTsn1Wr2" # ruoyi-secret
+              client-authentication-methods:
+                - client_secret_basic
+              authorization-grant-types:
+                - authorization_code
+                - refresh_token
+                - client_credentials
+              redirect-uris:
+                - http://127.0.0.1:8080/login/oauth2/code/ruoyi-client
+                - http://127.0.0.1:8080/authorized
+              post-logout-redirect-uris:
+                - http://127.0.0.1:8080/logged-out
+              scopes:
+                - openid
+                - profile
+                - read
+                - write
+            require-authorization-consent: true
+
+# Casbin配置
+casbin:
+  model: casbin/rbac_model.conf
+  policy: casbin_policy.csv
+  adapter:
+    type: database  # 使用数据库适配器，可选值：database, file
+  enable-auto-save: true
+  enable-log: true
+
+# 日志配置
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.casbin: DEBUG
+    com.ruoyi: DEBUG

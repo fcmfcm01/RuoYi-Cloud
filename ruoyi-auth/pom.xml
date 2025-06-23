@@ -51,6 +51,18 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-security</artifactId>
         </dependency>
+
+        <!-- Casbin权限管理 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-casbin</artifactId>
+        </dependency>
+
+        <!-- OAuth2客户端 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-oauth2</artifactId>
+        </dependency>
         
     </dependencies>
 	
